@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketFlow - Modern Ticketing System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --light-bg: #f9fafb;
+            --border: #e5e7eb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background-color: white;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        
+        header {
+            background-color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 32px;
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links li {
+            margin-left: 24px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 32px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .form-footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 16px;
+            display: block;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 14px;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: 4px 0;
+        }
+        
+        <!-- HERO SECTION -->
+        .hero {
+            padding: 180px 0 100px;
+            background-color: var(--light-bg);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .hero-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .hero-content {
+            flex: 1;
+        }
+        
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            font-family: 'Baskerville Old Face', sans-serif;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 32px;
+            max-width: 500px;
+            font-family: 'Baskerville Old Face', sans-serif;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .primary-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        
+        .primary-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .secondary-btn {
+            background-color: white;
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #f0f4ff;
+            border-color: var(--primary);
+        }
+        
+        
+        .phone-mockup {
+            flex: 1;
+            position: relative;
+            max-width: 300px;
+        }
+        
+        .phone-frame {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: auto;
+        }
+        
+        .phone-screen {
+            position: absolute;
+            top: 5.5%;
+            left: 7.5%;
+            width: 85%;
+            height: 89%;
+            border-radius: 24px;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .phone-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        <!--FEATURE SECTION -->
+        .features {
+            padding: 80px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-family: 'Baskerville Old Face', sans-serif;
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: 'Baskerville Old Face', sans-serif;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #e0e7ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 15px;
+        }
+        
+        <!-- ticket section -->
+        .tickets-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .ticket-form {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .ticket-form h3 {
+            font-family: 'Baskerville Old Face', sans-serif;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .ticket-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+        
+        .ticket-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .ticket-header h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .ticket-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-answered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .ticket-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .reply-section {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: var(--light-bg);
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .view-reply-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        <!-- ABOUT SECTION -->
+        .about-section {
+            padding: 80px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .about-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .about-image {
+            flex: 1;
+        }
+        
+        .about-image img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        
+        .about-content {
+            flex: 1;
+        }
+        
+        .about-content h2 {
+            font-family: 'Baskerville Old Face', sans-serif;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        
+        .about-content p {
+            font-family: 'Baskerville Old Face', sans-serif;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+        
+        <!-- FAQ SECTION -->
+        .faq-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            width: 100%;
+            text-align: left;
+            padding: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-question span {
+            font-family: 'Baskerville Old Face', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .faq-answer p {
+            font-family: 'Baskerville Old Face', sans-serif;
+            color: #6b7280;
+            padding-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        <!-- FOOTER-->
+        footer {
+            background-color: white;
+            padding: 80px 0 40px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .footer-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .footer-about p {
+            color: var(--text-light);
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
+        
+        .footer-column h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .copyright {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .social-links a {
+            color: var(--text-light);
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        
+        @media (max-width: 768px) {
+            .hero-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .phone-mockup {
+                max-width: 250px;
+                margin: 0 auto;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .about-container {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .auth-buttons {
+                margin-left: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <img src="https://www.salesforce.com/ca/blog/wp-content/uploads/sites/12/2023/10/what-is-change-management-header.png">
+                    TicketFlow
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#tickets">Tickets</a></li>
+                    <li><a href="#about">About Us</a></li>
+                </ul>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="secondary-btn" id="loginBtn">Log in</button>
+                    <button class="primary-btn" id="signupBtn">Sign up</button>
+                </div>
+                <div class="user-dropdown" id="userDropdown" style="display: none;">
+                    <button class="user-btn">
+                        <span class="user-avatar" id="userAvatar">U</span>
+                        <span id="userName">User</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="#tickets" class="dropdown-item">My Tickets</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" id="logoutBtn">Log out</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Log in</h2>
+                <button class="close-btn" id="closeLoginModal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">Log in</button>
+                </div>
+                <div class="form-footer">
+                    Don't have an account? <a href="#" id="showSignupFromLogin">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sign up</h2>
+                <button class="close-btn" id="closeSignupModal">&times;</button>
+            </div>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required minlength="6">
+                </div>
+                <div class="error-message" id="signupError"></div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">Sign up</button>
+                </div>
+                <div class="form-footer">
+                    Already have an account? <a href="#" id="showLoginFromSignup">Log in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Revolutionize Your <br> Support Ticket <br> Management</h1>
+                    <p>Streamline your support, events, and operations with TicketFlow's powerful ticketing platform designed for teams of all sizes.</p>
+                    <div class="hero-buttons">
+                        <button class="primary-btn" id="heroSignupBtn">Sign up free</button>
+                        <button class="secondary-btn" id="heroLoginBtn">Log in</button>
+                    </div>
+                </div>
+                <div class="phone-mockup">
+                    <div style="position: relative; max-width: 300px; width: 100%;">
+                        <div class="phone-screen"></div>
+                        <img src="https://www.salesforce.com/ca/blog/wp-content/uploads/sites/12/2023/10/what-is-change-management-header.png" 
+                             alt="TicketFlow App" 
+                             style="width: 100%; height: auto; display: block; margin: 0 auto;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Empowering Support, Simplified</h2>
+                <p>TicketFlow combines powerful features with an intuitive interface to help you manage tickets efficiently.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>Smart Ticketing</h3>
+                    <p>Automatically categorize and prioritize tickets based on content and urgency.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Create Ticket</h3>
+                    <p>Effortlessly submit detailed tickets with our intuitive interface, ensuring prompt and accurate issue resolution.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor ticket status in real-time, ensuring transparency and accountability throughout the resolution process.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>View Status</h3>
+                    <p>Instantly check ticket status, category, and updates, empowering users with clear insights and control.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access your tickets from anywhere with our fully responsive mobile interface.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3>Integrations</h3>
+                    <p>Connect with your favorite tools through our powerful integration platform.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tickets Section -->
+    <section class="tickets-section" id="tickets">
+        <div class="container">
+            <div class="section-header">
+                <h2>Your Support Tickets</h2>
+                <p>Create and manage your support tickets</p>
+            </div>
+
+            <!-- Create Ticket Form -->
+            <div class="ticket-form">
+                <h3>Create New Ticket</h3>
+                <form id="ticketForm">
+                    <div class="form-group">
+                        <label for="ticketSubject">Subject</label>
+                        <input type="text" id="ticketSubject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketDesc">Description</label>
+                        <textarea id="ticketDesc" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketCategory">Category</label>
+                        <select id="ticketCategory">
+                            <option value="Technical">Technical</option>
+                            <option value="Billing">Billing</option>
+                            <option value="General">General</option>
+                            <option value="Feature Request">Feature Request</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="primary-btn" id="submitBtn">
+                        <span id="submitText">Submit Ticket</span>
+                    </button>
+                </form>
+            </div>
+
+           
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-container">
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="TicketFlow Team">
+                </div>
+                <div class="about-content">
+                    <h2>About TicketFlow</h2>
+                    <p>TicketFlow was founded in 2025 with a simple mission: to revolutionize how businesses handle support tickets and customer service.</p>
+                    <p>Our team of passionate developers and customer service experts have created a platform that combines powerful functionality with intuitive design.</p>
+                    <p>Today, we serve hundreds of businesses worldwide, helping them streamline their support processes and deliver exceptional customer experiences.</p>
+                    <button class="primary-btn">Learn More About Us</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Find answers to common questions about TicketFlow</p>
+            </div>
+
+            <div class="faq-container">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How does TicketFlow work?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>TicketFlow provides a centralized platform where you can create, manage, and resolve support tickets. Simply sign up, create tickets for your issues, and track progress through our intuitive dashboard.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What are the main benefits?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>TicketFlow helps you streamline support operations, improve response times, and enhance customer satisfaction. Key benefits include automated ticket routing, real-time notifications, performance analytics, and seamless team collaboration.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What does it cost?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>TicketFlow offers flexible pricing plans starting at $29/month for small teams. We also have enterprise solutions for larger organizations. All plans include a 14-day free trial with no credit card required.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Is my data secure?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Absolutely. TicketFlow uses enterprise-grade security including 256-bit encryption, regular backups, and SOC 2 compliance. We never share your data with third parties and offer customizable permission levels for your team.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <a href="#" class="footer-logo">TicketFlow</a>
+                    <p>The modern ticketing system that helps businesses streamline their support and operations.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Updates</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Webinars</a></li>
+                        <li><a href="#">API Docs</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">© 2023 TicketFlow. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/ticket-flow-6415b7378"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GOOGLE FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+    <script>
+        <!-- FIREBASE CONFIGURATION-->
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-0NokdhpgRF7VIi-FInDhPzX3PQzBQ-s",
+            authDomain: "ticketflow-3f423.firebaseapp.com",
+            projectId: "ticketflow-3f423",
+            storageBucket: "ticketflow-3f423.appspot.com",
+            messagingSenderId: "487555817352",
+            appId: "1:487555817352:web:f11d2a38f172c1364c243d",
+            measurementId: "G-VMPHZ36R4M"
+        };
+
+        <!-- INITIALISE FIREBASE-->
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        <!-- DOM ELEMENTS -->
+        const ticketForm = document.getElementById('ticketForm');
+        const ticketsContainer = document.getElementById('ticketsContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        
+        <!-- AUTH UI ELEMENT-->
+        const authButtons = document.getElementById('authButtons');
+        const userDropdown = document.getElementById('userDropdown');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        <!-- MODAL ELEMENT -->
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeSignupModal = document.getElementById('closeSignupModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginError = document.getElementById('loginError');
+        const signupError = document.getElementById('signupError');
+        const showSignupFromLogin = document.getElementById('showSignupFromLogin');
+        const showLoginFromSignup = document.getElementById('showLoginFromSignup');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const heroLoginBtn = document.getElementById('heroLoginBtn');
+        const heroSignupBtn = document.getElementById('heroSignupBtn');
+
+        <!-- MODAL FUNCTION -->
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            clearErrors();
+        }
+        
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function clearErrors() {
+            loginError.style.display = 'none';
+            signupError.style.display = 'none';
+            loginError.textContent = '';
+            signupError.textContent = '';
+        }
+        
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        <!-- EVENT LISTENER-->
+        loginBtn.addEventListener('click', () => openModal(loginModal));
+        signupBtn.addEventListener('click', () => openModal(signupModal));
+        heroLoginBtn.addEventListener('click', () => openModal(loginModal));
+        heroSignupBtn.addEventListener('click', () => openModal(signupModal));
+        
+        closeLoginModal.addEventListener('click', () => closeModal(loginModal));
+        closeSignupModal.addEventListener('click', () => closeModal(signupModal));
+        
+        showSignupFromLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(loginModal);
+            openModal(signupModal);
+        });
+        
+        showLoginFromSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(signupModal);
+            openModal(loginModal);
+        });
+        
+        <!-- CLOSING MODAL-->
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) closeModal(loginModal);
+            if (e.target === signupModal) closeModal(signupModal);
+        });
+        
+        <!-- DROPDOWN -->
+        document.querySelector('.user-btn').addEventListener('click', () => {
+            dropdownMenu.classList.toggle('show');
+        });
+        
+        <!-- CLOSE DROPDOWN-->
+        window.addEventListener('click', (e) => {
+            if (!e.target.matches('.user-btn') && !e.target.closest('.user-btn')) {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            }
+        });
+
+        <!-- LOGOUT FUNC-->
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await auth.signOut();
+                showMessage('Logged out successfully', 'success');
+            } catch (error) {
+                console.error("Logout error:", error);
+                showMessage('Error logging out. Please try again.', 'error');
+            }
+        });
+
+        <!-- FORM SUBMI -->
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearErrors();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log("User logged in:", userCredential.user);
+                closeModal(loginModal);
+                showMessage('Logged in successfully!', 'success');
+            } catch (error) {
+                console.error("Login error:", error);
+                let errorMessage = "An error occurred during login.";
+                
+                switch(error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = "Please enter a valid email address.";
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = "This account has been disabled.";
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = "No account found with this email.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "Incorrect password.";
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showError(loginError, errorMessage);
+            }
+        });
+        
+        <!-- SIGNUP SUBMI -->
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearErrors();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const name = document.getElementById('signupName').value;
+            
+            try {
+                <!-- CREATING USER -->
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                console.log("User created:", userCredential.user);
+                
+                <!-- UPDATE PROFILE -->
+                await userCredential.user.updateProfile({
+                    displayName: name
+                });
+                
+                <!-- USER FIRESTORE -->
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                closeModal(signupModal);
+                showMessage('Account created successfully!', 'success');
+            } catch (error) {
+                console.error("Signup error:", error);
+                let errorMessage = "An error occurred during signup.";
+                
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = "This email is already registered.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Please enter a valid email address.";
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = "Password should be at least 6 characters.";
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showError(signupError, errorMessage);
+            }
+        });
+
+        <!-- TICKET FORM-->
+        ticketForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please log in to create tickets');
+                return;
+            }
+
+            <!-- USER STAT-->
+            submitBtn.disabled = true;
+            submitText.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+
+            const ticket = {
+                subject: document.getElementById('ticketSubject').value,
+                description: document.getElementById('ticketDesc').value,
+                category: document.getElementById('ticketCategory').value,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                userId: user.uid,
+                email: user.email,
+                userName: user.displayName || user.email.split('@')[0],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                <!-- TICKET FIRESTORE-->
+                await db.collection('tickets').add(ticket);
+                ticketForm.reset();
+                showMessage('Ticket submitted successfully!', 'success');
+            } catch (error) {
+                console.error("Error adding ticket: ", error);
+                showMessage('Error submitting ticket. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.textContent = 'Submit Ticket';
+            }
+        });
+
+        <!-- TICKET FUNCTION-->
+        async function loadTickets(userId) {
+            ticketsContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loading-spinner" style="border-top-color: var(--primary);"></span> Loading tickets...</div>';
+            
+            try {
+                <!-- RT LISTERNER -->
+                return db.collection('tickets')
+                    .where('userId', '==', userId)
+                    .orderBy('createdAt', 'desc')
+                    .onSnapshot(querySnapshot => {
+                        if (querySnapshot.empty) {
+                            ticketsContainer.innerHTML = '<div class="no-tickets" style="text-align: center; padding: 20px;">No tickets found. Create your first ticket above!</div>';
+                            return;
+                        }
+
+                        ticketsContainer.innerHTML = '';
+                        querySnapshot.forEach(doc => {
+                            const ticket = doc.data();
+                            const ticketElement = createTicketElement(ticket, doc.id);
+                            ticketsContainer.appendChild(ticketElement);
+                        });
+
+                        <!-- REPLY BUTTON-->
+                        document.querySelectorAll('.view-reply-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const replySection = this.closest('.ticket-card').querySelector('.reply-section');
+                                if (replySection) {
+                                    replySection.style.display = replySection.style.display === 'block' ? 'none' : 'block';
+                                }
+                            });
+                        });
+                    }, error => {
+                        console.error("Error in tickets listener:", error);
+                        ticketsContainer.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: red;">Error loading tickets. Please refresh the page.</div>';
+                    });
+            } catch (error) {
+                console.error("Error setting up tickets listener:", error);
+                ticketsContainer.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: red;">Error loading tickets. Please refresh the page.</div>';
+            }
+        }
+
+        
+        <!-- SHOW AUTHNI -->
+        function showAuthMessage() {
+            ticketsContainer.innerHTML = `
+                <div class="auth-message" style="text-align: center; padding: 40px; border: 1px dashed #e5e7eb; border-radius: 8px;">
+                    <h3 style="font-family: 'Baskerville Old Face', sans-serif; margin-bottom: 20px;">Please Sign In</h3>
+                    <p style="margin-bottom: 20px;">You need to be signed in to view and create tickets.</p>
+                    <button class="primary-btn" style="margin: 10px;" onclick="document.getElementById('loginModal').style.display='flex'">
+                        Log In
+                    </button>
+                    <button class="secondary-btn" style="margin: 10px;" onclick="document.getElementById('signupModal').style.display='flex'">
+                        Sign Up
+                    </button>
+                </div>
+            `;
+        }
+
+        <!-- MESSAGE FUNC -->
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.padding = '15px 20px';
+            alertDiv.style.borderRadius = '6px';
+            alertDiv.style.color = 'white';
+            alertDiv.style.backgroundColor = type === 'success' ? '#10B981' : '#EF4444';
+            alertDiv.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            alertDiv.style.zIndex = '1000';
+            alertDiv.style.animation = 'fadeIn 0.3s ease-in-out';
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.animation = 'fadeOut 0.3s ease-in-out';
+                setTimeout(() => {
+                    document.body.removeChild(alertDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        let unsubscribeTickets = null;
+
+        <!-- STATE CHANGE -->
+        auth.onAuthStateChanged(user => {
+            if (unsubscribeTickets) {
+                unsubscribeTickets(); // Clean up previous listener
+            }
+            
+            if (user) {
+                // User is signed in
+                authButtons.style.display = 'none';
+                userDropdown.style.display = 'block';
+                userAvatar.textContent = user.displayName ? user.displayName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+                userName.textContent = user.displayName || user.email.split('@')[0];
+                
+                <!--UPDATE TIME-->
+                db.collection('users').doc(user.uid).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(error => {
+                    console.error("Error updating last login:", error);
+                });
+                
+                <!--LOAD TICKET-->
+                unsubscribeTickets = loadTickets(user.uid);
+            } else {
+                <!-- NO USER -->
+                authButtons.style.display = 'flex';
+                userDropdown.style.display = 'none';
+                showAuthMessage();
+            }
+        });
+
+       <!-- CSS ANI-->
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        <!-- FAQ TOG-->
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const icon = question.querySelector('i');
+                
+                if (answer.style.maxHeight) {
+                    answer.style.maxHeight = null;
+                    answer.style.padding = '0 20px';
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    answer.style.padding = '0 20px 20px';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
